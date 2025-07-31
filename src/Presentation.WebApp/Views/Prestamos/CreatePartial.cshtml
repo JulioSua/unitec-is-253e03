@@ -1,0 +1,54 @@
+@model Domain.Entities.IM253E03Prestamo
+
+<div class="modal-header">
+    <h5 class="modal-title">Agregar nuevo préstamo</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+</div>
+<form id="createPrestamoForm">
+    <div class="modal-body">
+        <div class="mb-2">
+            <label>Usuario:</label>
+            <select asp-for="UsuarioId" asp-items="ViewBag.UsuarioId" class="form-control" required></select>
+        </div>
+        <div class="mb-2">
+            <label>Libro:</label>
+            <select asp-for="LibroId" asp-items="ViewBag.LibroId" class="form-control" required></select>
+        </div>
+        <div class="mb-2">
+            <label>Fecha préstamo:</label>
+            <input asp-for="FechaPrestamo" type="date" class="form-control" required />
+        </div>
+        <div class="mb-2">
+            <label>Fecha devolución:</label>
+            <input asp-for="FechaDevolucion" type="date" class="form-control" />
+        </div>
+    </div>
+    <div class="modal-footer px-0">
+
+        <button type="submit" class="btn btn-primary">Agregar</button>
+    </div>
+</form>
+<script>
+$(function() {
+    $("#createPrestamoForm").on("submit", function (e) {
+        e.preventDefault();
+        var form = $(this);
+        $.ajax({
+            url: '/Prestamos/CreateModal',
+            type: 'POST',
+            data: form.serialize(),
+            success: function(result) {
+                if (result.success) {
+                    $("#createPrestamoModal").modal('hide');
+                    location.reload();
+                } else {
+                    alert('Error al agregar: ' + (result.message || ''));
+                }
+            },
+            error: function () {
+                alert("Error inesperado.");
+            }
+        });
+    });
+});
+</script>

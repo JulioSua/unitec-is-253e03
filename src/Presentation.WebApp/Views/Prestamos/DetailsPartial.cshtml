@@ -1,0 +1,21 @@
+@model Domain.Entities.IM253E03Prestamo
+
+<div class="modal-header">
+    <h5 class="modal-title">Detalles del préstamo</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+</div>
+<div class="modal-body">
+    <dl class="row">
+        <dt class="col-sm-4">Usuario</dt>
+        <dd class="col-sm-8">@Model.Usuario?.Nombre</dd>
+
+        <dt class="col-sm-4">Libro</dt>
+        <dd class="col-sm-8">@Model.Libro?.ISBN</dd>
+
+        <dt class="col-sm-4">Fecha préstamo</dt>
+        <dd class="col-sm-8">@Model.FechaPrestamo.ToShortDateString()</dd>
+
+        <dt class="col-sm-4">Fecha devolución</dt>
+        <dd class="col-sm-8">@Model.FechaDevolucion?.ToShortDateString()</dd>
+    </dl>
+</div>

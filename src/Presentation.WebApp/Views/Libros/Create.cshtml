@@ -1,0 +1,25 @@
+@model Domain.Entities.IM253E03Libro
+@{
+    ViewData["Title"] = "Crear libro";
+}
+<h1>Nuevo libro</h1>
+<form asp-action="Create" enctype="multipart/form-data">
+    <div class="mb-2">
+        <label>Autor:</label>
+        <input asp-for="Autor" class="form-control" required />
+    </div>
+    <div class="mb-2">
+        <label>Editorial:</label>
+        <input asp-for="Editorial" class="form-control" />
+    </div>
+    <div class="mb-2">
+        <label>ISBN:</label>
+        <input asp-for="ISBN" class="form-control" required />
+    </div>
+    <div class="mb-2">
+        <label>Foto:</label>
+        <input type="file" name="file" class="form-control" accept="image/*" />
+    </div>
+    <button type="submit" class="btn btn-primary">Insertar</button>
+
+</form>

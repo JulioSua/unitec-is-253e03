@@ -1,0 +1,132 @@
+﻿@{
+    ViewData["Title"] = "Hola Bienvenido";
+}
+
+<!-- Fuente estilo Spider-Verse -->
+<link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet" />
+
+<style>
+    body {
+        /* NO uses /wwwroot aquí, solo /img/ + nombre de archivo */
+        background-image: url('/img/comic.png');
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: cover;
+        font-family: 'Bangers', cursive;
+        color: #2c3e50;
+        margin: 0;
+    }
+
+    /* Capa para contenido legible sobre fondo */
+    .fondo-translucido {
+        background-color: rgba(255, 255, 255, 0.85);
+        padding: 2rem;
+        margin: 2rem auto;
+        border-radius: 12px;
+        max-width: 900px;
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Barra de navegación estilo Spider-Gwen */
+    .navbar-custom {
+        background-color: #9c27b0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 4px solid #ec407a;
+    }
+
+    .navbar-custom .nav-title {
+        color: #ffffff;
+        font-size: 2rem;
+        text-decoration: none;
+        letter-spacing: 1px;
+    }
+
+    .navbar-custom .nav-links a {
+        color: #ffffff;
+        margin-left: 20px;
+        text-decoration: none;
+        font-size: 1.2rem;
+        transition: background 0.3s ease;
+        padding: 6px 12px;
+        border-radius: 6px;
+    }
+
+    .navbar-custom .nav-links a:hover {
+        background-color: #7b1fa2;
+        text-decoration: none;
+    }
+
+    /* Botones */
+    .btn {
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        font-family: 'Bangers', cursive;
+        letter-spacing: 1px;
+    }
+
+    .btn-primary {
+        background-color: #ec407a;
+        border-color: #ec407a;
+        color: white;
+    }
+
+    .btn-success {
+        background-color: #26c6da;
+        border-color: #26c6da;
+        color: white;
+    }
+
+    .btn-info {
+        background-color: #ab47bc;
+        border-color: #ab47bc;
+        color: white;
+    }
+
+    .btn:hover {
+        opacity: 0.92;
+    }
+
+    .text-center h1 {
+        font-size: 3rem;
+        line-height: 1.5;
+        color: #ec407a;
+    }
+
+    .lead {
+        font-size: 1.5rem;
+        color: #37474f;
+    }
+
+    hr {
+        border-top: 2px solid #ab47bc;
+        width: 60%;
+        margin: 2rem auto;
+    }
+</style>
+
+<!-- Barra de navegación superior -->
+<div class="navbar-custom">
+    <a href="#" class="nav-title">Biblioteca Digital</a>
+    <div class="nav-links">
+        <a asp-controller="Libros" asp-action="Index">Libros</a>
+        <a asp-controller="Usuarios" asp-action="Index">Usuarios</a>
+        <a asp-controller="Prestamos" asp-action="Index">Préstamos</a>
+    </div>
+</div>
+
+<!-- Contenido con capa translúcida -->
+<div class="fondo-translucido text-center">
+    <h1 class="display-4">
+        ¡Bienvenido al Multiverso de Libros! 📚🕸️<br /><br />
+        Gestiona tu colección con estilo y velocidad.
+    </h1>
+    <p class="lead">Administra tus Libros, Usuarios y Préstamos.</p>
+    <hr class="my-4" />
+</div>

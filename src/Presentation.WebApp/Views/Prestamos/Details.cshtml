@@ -1,0 +1,16 @@
+@model Domain.Entities.IM253E03Prestamo
+@{
+    ViewData["Title"] = "Detalle préstamo";
+}
+<h1>Detalle de préstamo</h1>
+<dl class="row">
+    <dt class="col-sm-2">Usuario</dt>
+    <dd class="col-sm-10">@Model.Usuario?.Nombre</dd>
+    <dt class="col-sm-2">Libro</dt>
+    <dd class="col-sm-10">@Model.Libro?.ISBN</dd>
+    <dt class="col-sm-2">Fecha préstamo</dt>
+    <dd class="col-sm-10">@Model.FechaPrestamo.ToShortDateString()</dd>
+    <dt class="col-sm-2">Fecha devolución</dt>
+    <dd class="col-sm-10">@Model.FechaDevolucion?.ToShortDateString()</dd>
+</dl>
+<a asp-action="Index" class="btn btn-danger mt-3">Regresar</a>

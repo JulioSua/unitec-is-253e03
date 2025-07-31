@@ -1,0 +1,205 @@
+@model List<Domain.Entities.IM253E03Usuario>
+@{
+    ViewData["Title"] = "Usuarios";
+}
+
+<button type="button" class="btn btn-gradient-green mb-2" id="btnShowCreateUsuario">Agregar usuario</button>
+<h1>Usuarios</h1>
+<table id="usuariosTable" class="table table-bordered">
+    <thead>
+    <tr>
+        <th>Nombre</th>
+        <th>Dirección</th>
+        <th>Teléfono</th>
+        <th>Correo</th>
+        <th class="noExport">Acciones</th>
+    </tr>
+    </thead>
+    <tbody>
+@foreach (var u in Model)
+{
+    <tr>
+        <td>@u.Nombre</td>
+        <td>@u.Direccion</td>
+        <td>@u.Telefono</td>
+        <td>@u.Correo</td>
+        <td>
+            <button class="btn btn-info btn-sm btn-detalles-usuario" data-id="@u.Id">Detalles</button>
+            <button type="button" class="btn btn-warning btn-sm btn-editar-usuario" data-id="@u.Id">Editar</button>
+            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-userid="@u.Id">
+                Eliminar
+            </button>
+        </td>
+    </tr>
+}
+@if (!Model.Any())
+{
+    <tr>
+        <td colspan="5" class="text-center">No hay usuarios registrados.</td>
+    </tr>
+}
+    </tbody>
+</table>
+
+<!-- MODALES (sin cambios) -->
+<div class="modal fade" id="createUsuarioModal" tabindex="-1" aria-labelledby="createUsuarioLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" id="createUsuarioModalContent"></div>
+  </div>
+</div>
+
+<div class="modal fade" id="editUsuarioModal" tabindex="-1" aria-labelledby="editUsuarioLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" id="editUsuarioModalContent"></div>
+  </div>
+</div>
+
+<div class="modal fade" id="detallesUsuarioModal" tabindex="-1" aria-labelledby="detallesUsuarioLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" id="detallesUsuarioModalContent"></div>
+  </div>
+</div>
+
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmDeleteModalLabel">¿Borrar?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        ¿Estás seguro que deseas eliminar este usuario?
+      </div>
+      <div class="modal-footer">
+        <form id="deleteForm" method="post">
+            <button type="submit" class="btn btn-danger">Eliminar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+    <!-- Librerías DataTables -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css"/>
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css"/>
+
+    <!-- 🎨 Ajuste CSS para paginador blanco -->
+    <style>
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        color: white !important;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button.previous,
+    .dataTables_wrapper .dataTables_paginate .paginate_button.next {
+        color: white !important;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        color: white !important;
+        background-color: transparent !important;
+        border: none !important;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        color: white !important;
+        background-color: transparent !important;
+    }
+    </style>
+
+    <script>
+    // Modal eliminar
+    var confirmDeleteModal = document.getElementById('confirmDeleteModal');
+    confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        var userId = button.getAttribute('data-userid');
+        var form = document.getElementById('deleteForm');
+        form.action = '/Usuarios/Delete/' + userId;
+    });
+
+    // Modal crear usuario
+    $(document).on("click", "#btnShowCreateUsuario", function () {
+        $("#createUsuarioModalContent").html('<div class="modal-body text-center p-5">Cargando...</div>');
+        $("#createUsuarioModal").modal("show");
+        $.get("/Usuarios/CreateModal")
+            .done(function (data) { $("#createUsuarioModalContent").html(data); })
+            .fail(function () { $("#createUsuarioModalContent").html('<div class="modal-body text-danger p-4">Error al cargar el formulario.</div>'); });
+    });
+    $('#createUsuarioModal').on('hidden.bs.modal', function () { $("#createUsuarioModalContent").html(''); });
+
+    // Modal editar usuario
+    $(document).on("click", ".btn-editar-usuario", function () {
+        var id = $(this).data("id");
+        $("#editUsuarioModalContent").html('<div class="modal-body text-center p-5">Cargando...</div>');
+        $("#editUsuarioModal").modal("show");
+        $.get("/Usuarios/EditModal", { id: id })
+            .done(function (data) { $("#editUsuarioModalContent").html(data); })
+            .fail(function () { $("#editUsuarioModalContent").html('<div class="modal-body text-danger p-4">Error al cargar el formulario de edición.</div>'); });
+    });
+    $('#editUsuarioModal').on('hidden.bs.modal', function () { $("#editUsuarioModalContent").html(''); });
+
+    // Modal detalles usuario
+    $(document).on("click", ".btn-detalles-usuario", function () {
+        var id = $(this).data("id");
+        $("#detallesUsuarioModalContent").html('<div class="modal-body text-center p-5">Cargando...</div>');
+        $("#detallesUsuarioModal").modal("show");
+        $.get("/Usuarios/Details", { id: id })
+            .done(function (data) { $("#detallesUsuarioModalContent").html(data); })
+            .fail(function () { $("#detallesUsuarioModalContent").html('<div class="modal-body text-danger p-4">Error al cargar los detalles.</div>'); });
+    });
+    $('#detallesUsuarioModal').on('hidden.bs.modal', function () { $("#detallesUsuarioModalContent").html(''); });
+
+    // DataTable con exportación y traducción
+    $(document).ready(function () {
+        $('#usuariosTable').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    extend: 'excel',
+                    className: 'btn btn-secondary',
+                    text: 'Excel',
+                    exportOptions: { columns: ':not(.noExport)' }
+                },
+                {
+                    extend: 'pdf',
+                    className: 'btn btn-secondary',
+                    text: 'PDF',
+                    exportOptions: { columns: ':not(.noExport)' },
+                    customize: function (doc) {
+                        doc.styles.title = { alignment: 'center', fontSize: 18, bold: true, margin: [0, 0, 0, 10] };
+                        doc.content[1].table.widths = ['*', '*', '*', '*'];
+                        doc.styles.tableHeader.alignment = 'center';
+                        var tableBody = doc.content[1].table.body;
+                        for (let i = 1; i < tableBody.length; i++) {
+                            for (let j = 0; j < tableBody[i].length; j++) {
+                                tableBody[i][j].alignment = 'center';
+                            }
+                        }
+                    },
+                    title: 'Usuarios - Biblioteca',
+                }
+            ],
+            language: {
+                "search": "Buscar:",
+                "lengthMenu": "Mostrar _MENU_ registros",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+                "infoEmpty": "Mostrando 0 a 0 de 0 entradas",
+                "infoFiltered": "(filtrado de _MAX_ entradas totales)",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                },
+                "zeroRecords": "No se encontraron resultados",
+                "emptyTable": "No hay datos disponibles en la tabla"
+            }
+        });
+    });
+    </script>
+}

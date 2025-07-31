@@ -1,0 +1,58 @@
+@model Domain.Entities.IM253E03Libro
+
+<div class="modal-header">
+    <h5 class="modal-title">Agregar libro</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+</div>
+<div class="modal-body">
+    <form id="createLibroForm" enctype="multipart/form-data">
+        <div class="mb-2">
+            <label>Autor:</label>
+            <input asp-for="Autor" class="form-control" required />
+        </div>
+        <div class="mb-2">
+            <label>Editorial:</label>
+            <input asp-for="Editorial" class="form-control" />
+        </div>
+        <div class="mb-2">
+            <label>ISBN:</label>
+            <input asp-for="ISBN" class="form-control" required />
+        </div>
+        <div class="mb-2">
+            <label>Foto:</label>
+            <input type="file" name="file" class="form-control" accept="image/*" />
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+
+    <button type="button" class="btn btn-primary" id="btnGuardarLibro">Agregar</button>
+</div>
+
+<script>
+$(function() {
+    // Al dar click en el botón, envía el formulario por AJAX
+    $("#btnGuardarLibro").on("click", function () {
+        var form = $("#createLibroForm")[0];
+        var formData = new FormData(form);
+        $.ajax({
+            url: '/Libros/CreateModal',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(result) {
+                if (result.success) {
+                    $("#createLibroModal").modal('hide');
+                    location.reload();
+                } else {
+                    alert('Error al agregar: ' + (result.message || ''));
+                }
+            },
+            error: function () {
+                alert("Error inesperado.");
+            }
+        });
+    });
+});
+</script>

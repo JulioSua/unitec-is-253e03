@@ -1,0 +1,57 @@
+@model Domain.Entities.IM253E03Usuario
+
+<div class="modal-header">
+    <h5 class="modal-title">Agregar usuario</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+</div>
+<div class="modal-body">
+    <form id="createUsuarioForm">
+        <div class="mb-2">
+            <label>Nombre:</label>
+            <input asp-for="Nombre" class="form-control" required />
+        </div>
+        <div class="mb-2">
+            <label>Dirección:</label>
+            <input asp-for="Direccion" class="form-control" />
+        </div>
+        <div class="mb-2">
+            <label>Teléfono:</label>
+            <input asp-for="Telefono" class="form-control" required />
+        </div>
+        <div class="mb-2">
+            <label>Correo:</label>
+            <input asp-for="Correo" class="form-control" required />
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+
+    <button type="button" class="btn btn-primary" id="btnGuardarUsuario">Agregar</button>
+</div>
+
+<script>
+$(function() {
+    $("#btnGuardarUsuario").on("click", function () {
+        var form = $("#createUsuarioForm")[0];
+        var formData = new FormData(form);
+        $.ajax({
+            url: '/Usuarios/CreateModal',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(result) {
+                if (result.success) {
+                    $("#createUsuarioModal").modal('hide');
+                    location.reload();
+                } else {
+                    alert('Error al agregar: ' + (result.message || ''));
+                }
+            },
+            error: function () {
+                alert("Error inesperado.");
+            }
+        });
+    });
+});
+</script>

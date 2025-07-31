@@ -1,0 +1,26 @@
+@model Domain.Entities.IM253E03Prestamo
+@{
+    ViewData["Title"] = "Editar préstamo";
+}
+<h1>Editar préstamo</h1>
+<form asp-action="Edit">
+    <input asp-for="Id" type="hidden" />
+    <div class="mb-2">
+        <label>Usuario:</label>
+        <select asp-for="UsuarioId" asp-items="ViewBag.UsuarioId" class="form-control"></select>
+    </div>
+    <div class="mb-2">
+        <label>Libro:</label>
+        <select asp-for="LibroId" asp-items="ViewBag.LibroId" class="form-control"></select>
+    </div>
+    <div class="mb-2">
+        <label>Fecha préstamo:</label>
+        <input asp-for="FechaPrestamo" type="date" class="form-control" required />
+    </div>
+    <div class="mb-2">
+        <label>Fecha devolución:</label>
+        <input asp-for="FechaDevolucion" type="date" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Actualizar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

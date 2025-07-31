@@ -1,0 +1,16 @@
+@model Domain.Entities.IM253E03Usuario
+@{
+    ViewData["Title"] = "Detalle usuario";
+}
+<h1>Detalle de usuario</h1>
+<dl class="row">
+    <dt class="col-sm-2">Nombre</dt>
+    <dd class="col-sm-10">@Model.Nombre</dd>
+    <dt class="col-sm-2">Dirección</dt>
+    <dd class="col-sm-10">@Model.Direccion</dd>
+    <dt class="col-sm-2">Teléfono</dt>
+    <dd class="col-sm-10">@Model.Telefono</dd>
+    <dt class="col-sm-2">Correo</dt>
+    <dd class="col-sm-10">@Model.Correo</dd>
+</dl>
+<a asp-action="Index" class="btn btn-danger mt-3">Regresar</a>

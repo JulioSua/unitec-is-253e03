@@ -1,0 +1,23 @@
+@model Domain.Entities.IM253E03Libro
+
+<div class="modal-header">
+    <h5 class="modal-title">Detalle del libro</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+</div>
+<div class="modal-body">
+    <dl class="row">
+        <dt class="col-sm-3">Autor</dt>
+        <dd class="col-sm-9">@Model.Autor</dd>
+        <dt class="col-sm-3">Editorial</dt>
+        <dd class="col-sm-9">@Model.Editorial</dd>
+        <dt class="col-sm-3">ISBN</dt>
+        <dd class="col-sm-9">@Model.ISBN</dd>
+        <dt class="col-sm-3">Foto</dt>
+        <dd class="col-sm-9">
+            @if (!string.IsNullOrEmpty(Model.Foto))
+            {
+                <img src="@Model.Foto" style="max-width:128px;max-height:128px;" />
+            }
+        </dd>
+    </dl>
+</div>

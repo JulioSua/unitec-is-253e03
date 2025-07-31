@@ -1,0 +1,207 @@
+@model List<Domain.Entities.IM253E03Libro>
+@{
+    ViewData["Title"] = "Libros";
+}
+<!-- Botón para abrir modal AJAX de agregar -->
+<button type="button" class="btn btn-gradient-green mb-2" id="btnAgregarLibro">Agregar libro</button>
+<h1>Libros</h1>
+<table id="librosTable" class="table table-bordered">
+    <thead>
+    <tr>
+        <th>Autor</th>
+        <th>Editorial</th>
+        <th>ISBN</th>
+        <th class="noExport">Foto</th>
+        <th class="noExport">Acciones</th>
+    </tr>
+    </thead>
+    <tbody>
+@foreach (var l in Model)
+{
+    <tr>
+        <td>@l.Autor</td>
+        <td>@l.Editorial</td>
+        <td>@l.ISBN</td>
+        <td>
+            @if (!string.IsNullOrEmpty(l.Foto))
+            {
+                <img src="@l.Foto" style="max-width:64px;max-height:64px;" />
+            }
+        </td>
+        <td>
+            <button type="button" class="btn btn-info btn-sm btn-detalles-libro" data-id="@l.Id">Detalles</button>
+            <button type="button" class="btn btn-warning btn-sm btn-editar-libro" data-id="@l.Id">Editar</button>
+            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-libroid="@l.Id">
+                Eliminar
+            </button>
+        </td>
+    </tr>
+}
+@if (!Model.Any())
+{
+    <tr>
+        <td colspan="5" class="text-center">No hay libros registrados.</td>
+    </tr>
+}
+    </tbody>
+</table>
+
+<!-- Modal para Detalles AJAX -->
+<div class="modal fade" id="detallesLibroModal" tabindex="-1" aria-labelledby="detallesLibroModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" id="detallesLibroModalContent">
+      <!-- Contenido cargado vía AJAX -->
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Confirmar Eliminación -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmDeleteModalLabel">¿Borrar?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        ¿Estás seguro que deseas eliminar este libro?
+      </div>
+      <div class="modal-footer">
+        <form id="deleteFormLibro" method="post">
+            <button type="submit" class="btn btn-danger">Eliminar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Crear Libro AJAX -->
+<div class="modal fade" id="createLibroModal" tabindex="-1" aria-labelledby="createLibroLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" id="createLibroModalContent">
+      <!-- El formulario CreatePartial se cargará aquí por AJAX -->
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Editar Libro AJAX -->
+<div class="modal fade" id="editLibroModal" tabindex="-1" aria-labelledby="editLibroLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" id="editLibroModalContent">
+      <!-- El formulario EditPartial se cargará aquí por AJAX -->
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+<script>
+    // Modal Detalles Libro (AJAX)
+    $(document).on("click", ".btn-detalles-libro", function () {
+        var id = $(this).data("id");
+        $("#detallesLibroModalContent").html('<div class="modal-body text-center p-5">Cargando...</div>');
+        $("#detallesLibroModal").modal("show");
+        $.get("/Libros/Details", { id: id })
+            .done(function (data) {
+                $("#detallesLibroModalContent").html(data);
+            })
+            .fail(function () {
+                $("#detallesLibroModalContent").html('<div class="modal-body text-danger p-4">Error al cargar los detalles.</div>');
+            });
+    });
+    $('#detallesLibroModal').on('hidden.bs.modal', function () {
+        $("#detallesLibroModalContent").html('');
+    });
+
+    // Modal Delete
+    var confirmDeleteModal = document.getElementById('confirmDeleteModal');
+    confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        var libroId = button.getAttribute('data-libroid');
+        var form = document.getElementById('deleteFormLibro');
+        form.action = '/Libros/Delete/' + libroId;
+    });
+
+    // Modal Crear Libro (AJAX)
+    $(document).on("click", "#btnAgregarLibro", function () {
+        $("#createLibroModalContent").html('<div class="modal-body text-center p-5">Cargando...</div>');
+        $("#createLibroModal").modal("show");
+        $.get("/Libros/CreateModal", function (data) {
+            $("#createLibroModalContent").html(data);
+        }).fail(function () {
+            $("#createLibroModalContent").html('<div class="modal-body text-danger p-4">Error al cargar el formulario.</div>');
+        });
+    });
+    $('#createLibroModal').on('hidden.bs.modal', function () {
+        $("#createLibroModalContent").html('');
+    });
+
+    // Modal Editar Libro (AJAX)
+    $(document).on("click", ".btn-editar-libro", function () {
+        var id = $(this).data("id");
+        $("#editLibroModalContent").html('<div class="modal-body text-center p-5">Cargando...</div>');
+        $("#editLibroModal").modal("show");
+        $.get("/Libros/EditModal", { id: id })
+            .done(function (data) { $("#editLibroModalContent").html(data); })
+            .fail(function () { $("#editLibroModalContent").html('<div class="modal-body text-danger p-4">Error al cargar el formulario de edición.</div>'); });
+    });
+    $('#editLibroModal').on('hidden.bs.modal', function () { $("#editLibroModalContent").html(''); });
+
+    // DataTables con exportación Excel/PDF y español
+    $(document).ready(function () {
+        $('#librosTable').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    extend: 'excel',
+                    className: 'btn btn-secondary',
+                    text: 'Excel',
+                    exportOptions: {
+                        columns: ':not(.noExport)'
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    className: 'btn btn-secondary',
+                    text: 'PDF',
+                    exportOptions: {
+                        columns: ':not(.noExport)'
+                    },
+                    customize: function (doc) {
+                        doc.styles.title = {
+                            alignment: 'center',
+                            fontSize: 18,
+                            bold: true,
+                            margin: [0, 0, 0, 10]
+                        };
+                        var tableBody = doc.content[1].table.body;
+                        doc.content[1].table.widths = ['*', '*', '*'];
+                        doc.styles.tableHeader.alignment = 'center';
+                        for (let i = 1; i < tableBody.length; i++) {
+                            for (let j = 0; j < tableBody[i].length; j++) {
+                                tableBody[i][j].alignment = 'center';
+                            }
+                        }
+                    },
+                    title: 'Libros - Biblioteca',
+                }
+            ],
+            language: {
+                "search": "Buscar:",
+                "lengthMenu": "Mostrar _MENU_ registros",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+                "infoEmpty": "Mostrando 0 a 0 de 0 entradas",
+                "infoFiltered": "(filtrado de _MAX_ entradas totales)",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                },
+                "zeroRecords": "No se encontraron resultados",
+                "emptyTable": "No hay datos disponibles en la tabla"
+            }
+        });
+    });
+</script>
+}
+

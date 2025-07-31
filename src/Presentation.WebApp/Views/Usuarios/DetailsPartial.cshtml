@@ -1,0 +1,18 @@
+@model Domain.Entities.IM253E03Usuario
+
+<div class="modal-header">
+    <h5 class="modal-title">Detalle de usuario</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+</div>
+<div class="modal-body">
+    <dl class="row">
+        <dt class="col-sm-3">Nombre</dt>
+        <dd class="col-sm-9">@Model.Nombre</dd>
+        <dt class="col-sm-3">Dirección</dt>
+        <dd class="col-sm-9">@Model.Direccion</dd>
+        <dt class="col-sm-3">Teléfono</dt>
+        <dd class="col-sm-9">@Model.Telefono</dd>
+        <dt class="col-sm-3">Correo</dt>
+        <dd class="col-sm-9">@Model.Correo</dd>
+    </dl>
+</div>

@@ -1,0 +1,216 @@
+@model List<Domain.Entities.IM253E03Prestamo>
+@{
+    ViewData["Title"] = "Préstamos";
+}
+<a id="btnOpenCreateModal" class="btn btn-gradient-green mb-2">Nuevo préstamo</a>
+
+<h1>Préstamos</h1>
+
+<table id="prestamosTable" class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Usuario</th>
+            <th>Libro</th>
+            <th>Fecha préstamo</th>
+            <th>Fecha devolución</th>
+            <th class="noExport">Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var p in Model)
+{
+    <tr>
+        <td>@p.Usuario?.Nombre</td>
+        <td>@p.Libro?.ISBN</td>
+        <td>@p.FechaPrestamo.ToShortDateString()</td>
+        <td>@(p.FechaDevolucion?.ToShortDateString() ?? "-")</td>
+        <td>
+            <button class="btn btn-info btn-sm btn-detalles" data-id="@p.Id">Detalles</button>
+            <button type="button" class="btn btn-warning btn-sm btn-editar-prestamo" data-id="@p.Id">Editar</button>
+            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-prestamoid="@p.Id">
+                Eliminar
+            </button>
+        </td>
+    </tr>
+}
+@if (!Model.Any())
+{
+    <tr><td colspan="5" class="text-center">No hay préstamos registrados.</td></tr>
+}
+    </tbody>
+</table>
+
+<!-- MODAL: Crear préstamo -->
+<div class="modal fade" id="createPrestamoModal" tabindex="-1" aria-labelledby="createPrestamoLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" id="createPrestamoModalContent"></div>
+  </div>
+</div>
+
+<!-- MODAL: Editar préstamo -->
+<div class="modal fade" id="editPrestamoModal" tabindex="-1" aria-labelledby="editPrestamoLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" id="editPrestamoModalContent"></div>
+  </div>
+</div>
+
+<!-- MODAL: Detalles préstamo -->
+<div class="modal fade" id="detallesModal" tabindex="-1" aria-labelledby="detallesModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" id="detallesModalContent"></div>
+  </div>
+</div>
+
+<!-- MODAL: Confirmar eliminación -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">¿Borrar?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        ¿Estás seguro que deseas eliminar este préstamo?
+      </div>
+      <div class="modal-footer">
+        <form id="deleteFormPrestamo" method="post">
+            <button type="submit" class="btn btn-danger">Eliminar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+    <!-- DataTables y dependencias -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css"/>
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css"/>
+
+    <!-- 🎨 Ajuste CSS para paginador blanco -->
+    <style>
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        color: white !important;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button.previous,
+    .dataTables_wrapper .dataTables_paginate .paginate_button.next {
+        color: white !important;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        color: white !important;
+        background-color: transparent !important;
+        border: none !important;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        color: white !important;
+        background-color: transparent !important;
+    }
+    </style>
+
+    <script>
+    // MODAL: Abrir para agregar préstamo
+    $("#btnOpenCreateModal").on("click", function () {
+        $("#createPrestamoModalContent").html('<div class="modal-body text-center p-5">Cargando...</div>');
+        $("#createPrestamoModal").modal("show");
+        $.get("/Prestamos/CreateModal")
+            .done(function (data) { $("#createPrestamoModalContent").html(data); })
+            .fail(function () { $("#createPrestamoModalContent").html('<div class="modal-body text-danger p-4">Error al cargar el formulario.</div>'); });
+    });
+    $('#createPrestamoModal').on('hidden.bs.modal', function () { $("#createPrestamoModalContent").html(''); });
+
+    // MODAL: Eliminar
+    var confirmDeleteModal = document.getElementById('confirmDeleteModal');
+    confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        var prestamoId = button.getAttribute('data-prestamoid');
+        var form = document.getElementById('deleteFormPrestamo');
+        form.action = '/Prestamos/Delete/' + prestamoId;
+    });
+
+    // MODAL: Detalles
+    $(document).on("click", ".btn-detalles", function () {
+        var id = $(this).data("id");
+        $("#detallesModalContent").html('<div class="modal-body text-center p-5">Cargando...</div>');
+        $("#detallesModal").modal("show");
+        $.get("/Prestamos/Details", { id: id })
+            .done(function (data) { $("#detallesModalContent").html(data); })
+            .fail(function () { $("#detallesModalContent").html('<div class="modal-body text-danger p-4">Error al cargar los detalles.</div>'); });
+    });
+    $('#detallesModal').on('hidden.bs.modal', function () { $("#detallesModalContent").html(''); });
+
+    // MODAL: Editar préstamo
+    $(document).on("click", ".btn-editar-prestamo", function () {
+        var id = $(this).data("id");
+        $("#editPrestamoModalContent").html('<div class="modal-body text-center p-5">Cargando...</div>');
+        $("#editPrestamoModal").modal("show");
+        $.get("/Prestamos/EditModal", { id: id })
+            .done(function (data) { $("#editPrestamoModalContent").html(data); })
+            .fail(function () { $("#editPrestamoModalContent").html('<div class="modal-body text-danger p-4">Error al cargar el formulario de edición.</div>'); });
+    });
+    $('#editPrestamoModal').on('hidden.bs.modal', function () { $("#editPrestamoModalContent").html(''); });
+
+    // DataTables con exportación y traducción
+    $(document).ready(function () {
+        $('#prestamosTable').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    extend: 'excel',
+                    className: 'btn btn-secondary',
+                    text: 'Excel',
+                    exportOptions: {
+                        columns: ':not(.noExport)'
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    className: 'btn btn-secondary',
+                    text: 'PDF',
+                    exportOptions: {
+                        columns: ':not(.noExport)'
+                    },
+                    customize: function (doc) {
+                        doc.styles.title = {
+                            alignment: 'center',
+                            fontSize: 18,
+                            bold: true,
+                            margin: [0, 0, 0, 10]
+                        };
+                        var tableBody = doc.content[1].table.body;
+                        doc.content[1].table.widths = ['*', '*', '*', '*'];
+                        doc.styles.tableHeader.alignment = 'center';
+                        for (let i = 1; i < tableBody.length; i++) {
+                            for (let j = 0; j < tableBody[i].length; j++) {
+                                tableBody[i][j].alignment = 'center';
+                            }
+                        }
+                    },
+                    title: 'Préstamos - Biblioteca',
+                }
+            ],
+            language: {
+                "search": "Buscar:",
+                "lengthMenu": "Mostrar _MENU_ registros",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ entradas",
+                "infoEmpty": "Mostrando 0 a 0 de 0 entradas",
+                "infoFiltered": "(filtrado de _MAX_ entradas totales)",
+                "paginate": {
+                    "first": "Primero",
+                    "last": "Último",
+                    "next": "Siguiente",
+                    "previous": "Anterior"
+                },
+                "zeroRecords": "No se encontraron resultados",
+                "emptyTable": "No hay datos disponibles en la tabla"
+            }
+        });
+    });
+    </script>
+}

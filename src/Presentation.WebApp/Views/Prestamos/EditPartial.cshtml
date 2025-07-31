@@ -1,0 +1,59 @@
+@model Domain.Entities.IM253E03Prestamo
+
+<div class="modal-header">
+    <h5 class="modal-title">Editar préstamo</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+</div>
+<form id="editPrestamoForm">
+    <div class="modal-body">
+        <input asp-for="Id" type="hidden" />
+        <div class="mb-2">
+            <label>Usuario:</label>
+            <select asp-for="UsuarioId" class="form-control" disabled>
+                <option selected>@Model.Usuario?.Nombre</option>
+            </select>
+        </div>
+        <div class="mb-2">
+            <label>Libro:</label>
+            <select asp-for="LibroId" class="form-control" disabled>
+                <option selected>@Model.Libro?.ISBN</option>
+            </select>
+        </div>
+        <div class="mb-2">
+            <label>Fecha préstamo:</label>
+            <input asp-for="FechaPrestamo" type="date" class="form-control" required />
+        </div>
+        <div class="mb-2">
+            <label>Fecha devolución:</label>
+            <input asp-for="FechaDevolucion" type="date" class="form-control" />
+        </div>
+    </div>
+    <div class="modal-footer">
+
+        <button type="submit" class="btn btn-primary">Actualizar</button>
+    </div>
+</form>
+<script>
+$(function() {
+    $("#editPrestamoForm").on("submit", function (e) {
+        e.preventDefault();
+        var form = $(this);
+        $.ajax({
+            url: '/Prestamos/EditModal',
+            type: 'POST',
+            data: form.serialize(),
+            success: function(result) {
+                if (result.success) {
+                    $("#editPrestamoModal").modal('hide');
+                    location.reload();
+                } else {
+                    alert('Error al actualizar: ' + (result.message || ''));
+                }
+            },
+            error: function () {
+                alert("Error inesperado.");
+            }
+        });
+    });
+});
+</script>

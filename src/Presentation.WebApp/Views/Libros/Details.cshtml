@@ -1,0 +1,18 @@
+@model Domain.Entities.IM253E03Libro
+@{
+    ViewData["Title"] = "Detalle libro";
+}
+<h1>Detalle de libro</h1>
+<dl class="row">
+    <dt class="col-sm-2">Autor</dt>
+    <dd class="col-sm-10">@Model.Autor</dd>
+    <dt class="col-sm-2">Editorial</dt>
+    <dd class="col-sm-10">@Model.Editorial</dd>
+    <dt class="col-sm-2">ISBN</dt>
+    <dd class="col-sm-10">@Model.ISBN</dd>
+    <dt class="col-sm-2">Foto</dt>
+    <dd class="col-sm-10">
+        <img src="@Model.Foto" style="max-width:128px;max-height:128px;" />
+    </dd>
+</dl>
+<a asp-action="Index" class="btn btn-danger mt-3">Regresar</a>

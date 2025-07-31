@@ -1,0 +1,61 @@
+@model Domain.Entities.IM253E03Libro
+
+<div class="modal-header">
+    <h5 class="modal-title">Editar libro</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+</div>
+<form id="editLibroForm" enctype="multipart/form-data">
+    <div class="modal-body">
+        <input asp-for="Id" type="hidden" />
+        <div class="mb-2">
+            <label>Autor:</label>
+            <input asp-for="Autor" class="form-control" required />
+        </div>
+        <div class="mb-2">
+            <label>Editorial:</label>
+            <input asp-for="Editorial" class="form-control" />
+        </div>
+        <div class="mb-2">
+            <label>ISBN:</label>
+            <input asp-for="ISBN" class="form-control" required />
+        </div>
+        <div class="mb-2">
+            <label>Foto actual:</label><br />
+            <img src="@Model.Foto" style="max-width:64px;max-height:64px;" /><br />
+            <label>Subir nueva foto:</label>
+            <input type="file" name="file" class="form-control" accept="image/*" />
+        </div>
+    </div>
+    <div class="modal-footer px-0">
+
+        <button type="submit" class="btn btn-primary">Actualizar</button>
+    </div>
+</form>
+
+<script>
+$(function() {
+    $("#editLibroForm").on("submit", function (e) {
+        e.preventDefault();
+        var form = $(this)[0];
+        var formData = new FormData(form);
+        $.ajax({
+            url: '/Libros/EditModal',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(result) {
+                if (result.success) {
+                    $("#editLibroModal").modal('hide');
+                    location.reload(); // O actualiza la fila si quieres 100% dinámico
+                } else {
+                    alert('Error al actualizar: ' + (result.message || ''));
+                }
+            },
+            error: function () {
+                alert("Error inesperado.");
+            }
+        });
+    });
+});
+</script>

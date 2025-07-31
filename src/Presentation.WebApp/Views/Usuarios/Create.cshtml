@@ -1,0 +1,25 @@
+@model Domain.Entities.IM253E03Usuario
+@{
+    ViewData["Title"] = "Crear usuario";
+}
+<h1>Nuevo usuario</h1>
+<form asp-action="Create">
+    <div class="mb-2">
+        <label>Nombre:</label>
+        <input asp-for="Nombre" class="form-control" required />
+    </div>
+    <div class="mb-2">
+        <label>Dirección:</label>
+        <input asp-for="Direccion" class="form-control" />
+    </div>
+    <div class="mb-2">
+        <label>Teléfono:</label>
+        <input asp-for="Telefono" class="form-control" required />
+    </div>
+    <div class="mb-2">
+        <label>Correo:</label>
+        <input asp-for="Correo" class="form-control" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Insertar</button>
+
+</form>

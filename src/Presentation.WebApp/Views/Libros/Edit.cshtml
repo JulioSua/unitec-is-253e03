@@ -1,0 +1,28 @@
+@model Domain.Entities.IM253E03Libro
+@{
+    ViewData["Title"] = "Editar libro";
+}
+<h1>Editar libro</h1>
+<form asp-action="Edit" enctype="multipart/form-data">
+    <input asp-for="Id" type="hidden" />
+    <div class="mb-2">
+        <label>Autor:</label>
+        <input asp-for="Autor" class="form-control" required />
+    </div>
+    <div class="mb-2">
+        <label>Editorial:</label>
+        <input asp-for="Editorial" class="form-control" />
+    </div>
+    <div class="mb-2">
+        <label>ISBN:</label>
+        <input asp-for="ISBN" class="form-control" required />
+    </div>
+    <div class="mb-2">
+        <label>Foto actual:</label><br />
+        <img src="@Model.Foto" style="max-width:64px;max-height:64px;" /><br />
+        <label>Subir nueva foto:</label>
+        <input type="file" name="file" class="form-control" accept="image/*" />
+    </div>
+    <button type="submit" class="btn btn-primary">Actualizar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
